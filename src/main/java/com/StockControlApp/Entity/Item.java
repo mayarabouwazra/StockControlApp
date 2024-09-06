@@ -15,7 +15,7 @@ public class Item {
     private Project project;
 
     @ManyToOne
-    @JoinColumn(name = "mobile_store_id") // Correct the join column here
+    @JoinColumn(name = "mobile_store_id")
     private MobileStore mobileStore;
 
     @ManyToOne

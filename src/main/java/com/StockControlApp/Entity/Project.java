@@ -17,7 +17,7 @@ public class Project {
     private String engineerEmail;
     private boolean stockComplete;
     private boolean destinationConfirmed;
-
+//items
     @ManyToMany
     @JoinTable(
             name = "project_engineer",
