@@ -14,9 +14,7 @@ public class Item {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @ManyToOne
-    @JoinColumn(name = "mobile_store_id")
-    private MobileStore mobileStore;
+
 
     @ManyToOne
     @JoinColumn(name = "primary_store_id")
@@ -78,11 +76,5 @@ public class Item {
         this.primaryStore = primaryStore;
     }
 
-    public MobileStore getMobileStore() {
-        return mobileStore;
-    }
 
-    public void setMobileStore(MobileStore mobileStore) {
-        this.mobileStore = mobileStore;
-    }
 }

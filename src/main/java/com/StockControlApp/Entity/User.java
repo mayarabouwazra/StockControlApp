@@ -1,12 +1,10 @@
 package com.StockControlApp.Entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 @Table(name = "USER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Entity
-@Data
 public class User {
     @Id
     private String email;

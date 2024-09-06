@@ -14,8 +14,7 @@ public class MobileStore {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "mobileStore")
-    private List<Item> items;
+
 
 
     public MobileStore(){
@@ -46,12 +45,6 @@ public class MobileStore {
         this.project = project;
     }
 
-    public List<Item> getItems() {
-        return items;
-    }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
 
 }
