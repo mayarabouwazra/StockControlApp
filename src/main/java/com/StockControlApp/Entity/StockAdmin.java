@@ -1,5 +1,6 @@
 package com.StockControlApp.Entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -7,6 +8,8 @@ import lombok.Data;
 
 @Entity
 @Data
+@DiscriminatorValue("StockAdmin")
+
 public class StockAdmin extends User{
     @ManyToOne
     @JoinColumn(name = "profile_id")
