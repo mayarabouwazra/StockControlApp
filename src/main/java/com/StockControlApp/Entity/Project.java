@@ -25,6 +25,8 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "engineer_id")
     )
     private List<Engineer> engineers;
+    @OneToMany(mappedBy = "project")
+    private List<Item> items;
 
     public Project() {
     }
@@ -108,4 +110,12 @@ public class Project {
     public void setEngineerEmail(String engineerEmail) {
         this.engineerEmail = engineerEmail;
     }
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
 }

@@ -21,5 +21,6 @@ public class PrimaryStoreController {
     public Item addItemToPrimaryStore(@RequestBody Item newItem) {
         return primaryStoreService.addItemToPrimaryStore(newItem);
     }
+    //don't forget delete item
 
 }
