@@ -11,12 +11,26 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
     @Autowired
     private ProjectService projectService;
+
     @PostMapping("/{projectId}/addItem")
     public Project addItemToProject(@PathVariable Long projectId, @RequestBody Item newItem) {
+        if (projectId == null) {
+            throw new RuntimeException("Project ID is required.");
+        }
+        if (newItem == null) {
+            throw new RuntimeException("Item is required.");
+        }
         return projectService.addItemToProject(projectId, newItem);
     }
+
     @DeleteMapping("/{projectId}/deleteItem")
-    public  Project deleteItem (@PathVariable Long projectId,@RequestBody Item item){
-        return projectService.deleteItem(item,projectId);
+    public Project deleteItem(@PathVariable Long projectId, @RequestBody Item item) {
+        if (projectId == null) {
+            throw new RuntimeException("Project ID is required.");
+        }
+        if (item == null) {
+            throw new RuntimeException("Item is required.");
+        }
+        return projectService.deleteItem(item, projectId);
     }
 }

@@ -1,44 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Login extends StatelessWidget {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
 
-  void login(String email, String password, BuildContext context) async {
-    final response = await http.post(
-      Uri.parse('http://localhost:8080/User/login'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
+class _LoginState extends State<Login> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _storage = FlutterSecureStorage();
 
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final String token = responseData['token'];
-      final String email = responseData['email'];
-      final List<String> authorities = List<String>.from(responseData['authorities']);
-
-      // Store token, email, and authorities in SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-      await prefs.setString('email', email);
-      await prefs.setStringList('authorities', authorities);
-
-      // Navigate based on authorities
-      navigateBasedOnAuthorities(context, authorities);
-    } else {
+  Future<void> _login() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed. Please check your credentials.')),
+        SnackBar(content: Text('Please enter both email and password.')),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/User/login'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final token = responseData['token'];
+        final email = responseData['email'];
+        final authorities = List<String>.from(responseData['authorities']);
+
+        await _storage.write(key: 'token', value: token);
+        await _storage.write(key: 'email', value: email);
+        await _storage.write(key: 'authorities', value: authorities.join(','));
+
+        _navigateBasedOnAuthorities(authorities);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed. Please check your credentials.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
       );
     }
   }
 
-  void navigateBasedOnAuthorities(BuildContext context, List<String> authorities) {
+  void _navigateBasedOnAuthorities(List<String> authorities) {
     if (authorities.contains('Admin')) {
       Navigator.pushReplacementNamed(context, '/adminPage');
     } else if (authorities.contains('Engineer')) {
@@ -89,9 +105,7 @@ class Login extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
-                login(_emailController.text, _passwordController.text, context);
-              },
+              onPressed: _login,
               child: Text('Login'),
             ),
           ],

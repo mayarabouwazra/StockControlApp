@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stock_control_app/pages/login_page.dart';
 import 'Pages/Admin_page.dart';
+import 'Pages/projects_page.dart';
 
 
 void main() {
@@ -12,14 +13,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'User Page',
+      title: 'Stock Controle App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Login(),
       routes: {
         '/login': (context) => Login(),
-
+        '/projects':(context)=>ProjectsPage(),
         '/adminPage': (context) => AdminPage(),
       },
     );
