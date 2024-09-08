@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:chopper/chopper.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -44,15 +45,19 @@ class _LoginState extends State<Login> {
         _navigateBasedOnAuthorities(authorities);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed. Please check your credentials.')),
+          SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),
       );
+      print('Error: $e');
     }
   }
+
+
+
 
   void _navigateBasedOnAuthorities(List<String> authorities) {
     if (authorities.contains('Admin')) {
