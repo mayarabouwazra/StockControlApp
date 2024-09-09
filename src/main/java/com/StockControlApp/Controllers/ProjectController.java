@@ -23,6 +23,7 @@ public class ProjectController {
         return projectService.addItemToProject(projectId, newItem);
     }
 
+
     @DeleteMapping("/{projectId}/deleteItem")
     public Project deleteItem(@PathVariable Long projectId, @RequestBody Item item) {
         if (projectId == null) {

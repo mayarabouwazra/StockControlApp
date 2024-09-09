@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StockAdminRepository extends JpaRepository<StockAdmin,String> {
+    StockAdmin findByEmail(String email);
 }

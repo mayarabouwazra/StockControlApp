@@ -43,24 +43,50 @@ class _ProjectsPageState extends State<ProjectsPage> {
               .toList();
         });
       } else {
-        print('Failed to load projects');
+        _showErrorDialog('Failed to load projects');
       }
     } catch (e) {
-      print('Error fetching projects: $e');
+      _showErrorDialog('Error fetching projects: $e');
     }
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   void navigateToProjectDetails(Project project) {
-    try {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProjectDetailPage(project: project),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text('Project Details'),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Project ID: ${project.projectId}'),
+                Text('Project Name: ${project.projectName}'),
+                Text('Project Description: ${project.projectDescription}'),
+              ],
+            ),
+          ),
         ),
-      );
-    } catch (e) {
-      print('Error navigating to project details: $e');
-    }
+      ),
+    );
   }
 
   @override
@@ -78,31 +104,6 @@ class _ProjectsPageState extends State<ProjectsPage> {
             onTap: () => navigateToProjectDetails(projects[index]),
           );
         },
-      ),
-    );
-  }
-}
-
-class ProjectDetailPage extends StatelessWidget {
-  final Project project;
-
-  ProjectDetailPage({required this.project});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Project Details'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Project ID: ${project.projectId}'),
-            Text('Project Name: ${project.projectName}'),
-            Text('Project Description: ${project.projectDescription}'),
-          ],
-        ),
       ),
     );
   }
