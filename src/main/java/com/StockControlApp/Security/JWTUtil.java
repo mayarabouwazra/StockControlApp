@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 @Component
 public class JWTUtil {
-    private static final SecretKey SECRET_KEY = generateKey();
+    private static final String SECRET_KEY = "Secret_KEY";
 
     private static SecretKey generateKey() {
         try {

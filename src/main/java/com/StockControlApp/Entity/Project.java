@@ -10,14 +10,14 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectId;
 
-     private String projectName;
+    private String projectName;
     private String projectDescription;
-     private String projectManager;
+    private String projectManager;
     private String location;
-    private String engineerEmail;
+    private String engineerEmail; // Consider removing if you have a relationship with Engineer
     private boolean stockComplete;
     private boolean destinationConfirmed;
-//items
+
     @ManyToMany
     @JoinTable(
             name = "project_engineer",
@@ -25,9 +25,13 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "engineer_id")
     )
     private List<Engineer> engineers;
-    @OneToMany(mappedBy = "project")
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
+    @ManyToOne
+    @JoinColumn(name = "engineer_id")
+    private Engineer engineer;
     public Project() {
     }
 

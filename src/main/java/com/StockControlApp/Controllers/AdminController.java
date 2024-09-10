@@ -36,7 +36,7 @@ public class AdminController {
         String nom = engineerDetails.get("nom");
         String prenom = engineerDetails.get("prenom");
         String email = engineerDetails.get("email");
-        String senderEmail = "your-sender-email@example.com"; // Replace with actual sender email
+        String senderEmail = "farahelbey1998@gmail.com"; // Replace with actual sender email
         String senderPassword = "your-sender-password";        // Replace with actual sender password
         return adminService.createEngineerProfile(nom, prenom, email, senderEmail, senderPassword);
     }

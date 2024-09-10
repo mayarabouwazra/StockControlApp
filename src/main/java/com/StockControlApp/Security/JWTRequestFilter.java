@@ -37,6 +37,13 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
+        String requestURI = request.getRequestURI();
+
+        if (requestURI.equals("/User/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {
@@ -63,5 +70,4 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
-
 }

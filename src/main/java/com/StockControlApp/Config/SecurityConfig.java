@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -53,19 +54,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Disable CSRF
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/admin/**").hasAuthority("Admin")
-                        .requestMatchers("/stock/**").hasAuthority("StockAdmin")
-                        .requestMatchers("/Engineer/**").hasAuthority("Engineer")
-
+                        .requestMatchers("/User/login").permitAll()  // Public access to login
+                        .requestMatchers("/admin/**").hasAuthority("Admin")  // Admin pages
+                        .requestMatchers("/stock/**").hasAuthority("StockAdmin")  // Stock admin pages
+                        .requestMatchers("/Engineer/**").hasAuthority("Engineer")  // Engineer pages
                         .anyRequest().authenticated()  // All other requests require authentication
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session management
                 );
 
-
+        // Add JWT filter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

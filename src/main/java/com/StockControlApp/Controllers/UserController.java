@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,19 +35,10 @@ public class UserController {
         if (isValid) {
             String token = jwtUtil.generateToken(request.getEmail());
 
-            // Get the current authentication and extract the roles
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-            // Extract roles/authorities from the authenticated user
-            var authorities = userDetails.getAuthorities().stream()
-                    .map(grantedAuthority -> grantedAuthority.getAuthority())
-                    .collect(Collectors.toList());
-
+            // No need to extract authentication for login
             return ResponseEntity.ok(Map.of(
                     "token", token,
-                    "email", request.getEmail(),
-                    "authorities", authorities
+                    "email", request.getEmail()
             ));
         } else {
             return ResponseEntity.status(401).body("Invalid email or password");

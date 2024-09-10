@@ -3,14 +3,16 @@ package com.StockControlApp.Entity;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 
 @DiscriminatorValue("Engineer")
 
 public class Engineer extends User{
-    @ManyToMany(mappedBy = "engineers")
-    private HashSet<Project> projects;
+    @OneToMany(mappedBy = "engineer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Project> projects = new HashSet<>();
+
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
@@ -33,7 +35,7 @@ public class Engineer extends User{
     }
 
     public HashSet<Project> getProjects() {
-        return projects;
+        return (HashSet<Project>) projects;
     }
 
     public void setProjects(HashSet<Project> projects) {
