@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:chopper/chopper.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -14,6 +13,13 @@ class _LoginState extends State<Login> {
   final _passwordController = TextEditingController();
   final _storage = FlutterSecureStorage();
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _login() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -24,7 +30,7 @@ class _LoginState extends State<Login> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8080/User/login'),
+        Uri.parse('http://192.168.x.x:8080/User/login'), // Use IP address if testing on a device
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           'email': _emailController.text,
@@ -40,7 +46,7 @@ class _LoginState extends State<Login> {
 
         await _storage.write(key: 'token', value: token);
         await _storage.write(key: 'email', value: email);
-        await _storage.write(key: 'authorities', value: authorities.join(','));
+        await _storage.write(key: 'authorities', value: jsonEncode(authorities)); // Store as JSON
 
         _navigateBasedOnAuthorities(authorities);
       } else {
@@ -48,16 +54,14 @@ class _LoginState extends State<Login> {
           SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
         );
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),
       );
       print('Error: $e');
+      print('Stacktrace: $stacktrace');
     }
   }
-
-
-
 
   void _navigateBasedOnAuthorities(List<String> authorities) {
     if (authorities.contains('Admin')) {
@@ -110,7 +114,7 @@ class _LoginState extends State<Login> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _login,
+              onPressed:  _login,
               child: Text('Login'),
             ),
           ],

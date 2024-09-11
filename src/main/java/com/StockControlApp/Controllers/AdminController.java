@@ -46,8 +46,8 @@ public class AdminController {
         String nom = stockAdminDetails.get("nom");
         String prenom = stockAdminDetails.get("prenom");
         String email = stockAdminDetails.get("email");
-        String senderEmail = "your-sender-email@example.com";
-        String senderPassword = "your-sender-password";
+        String senderEmail = "farahelbey1998@gmail.com";
+        String senderPassword = "defaultPassword";
         return adminService.createStockAdminProfile(nom, prenom, email, senderEmail, senderPassword);
     }
 
