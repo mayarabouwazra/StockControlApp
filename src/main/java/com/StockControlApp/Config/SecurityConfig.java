@@ -1,7 +1,11 @@
 package com.StockControlApp.Config;
 
 import com.StockControlApp.Security.JWTRequestFilter;
+import com.StockControlApp.Security.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.Filter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,10 +14,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
+import jakarta.servlet.Filter;
+
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,21 +29,25 @@ import java.util.Properties;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private JWTUtil jwtUtil;
 
     @Autowired
-    private JWTRequestFilter jwtRequestFilter;
+    private UserDetailsService userDetailsService;
+
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("your-smtp-host");
+        mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("your-email-username");
-        mailSender.setPassword("your-email-password");
+        mailSender.setUsername("farahelbey1998@gmail.com");
+        mailSender.setPassword("your-email-password"); // Replace with actual email password
         mailSender.setJavaMailProperties(getMailProperties());
         return mailSender;
     }
@@ -49,33 +60,32 @@ public class SecurityConfig {
         properties.setProperty("mail.debug", "true");
         return properties;
     }
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/User/login").permitAll()  // Public access to login
-                        .requestMatchers("/admin/**").hasAuthority("Admin")  // Admin pages
-                        .requestMatchers("/stock/**").hasAuthority("StockAdmin")  // Stock admin pages
-                        .requestMatchers("/Engineer/**").hasAuthority("Engineer")  // Engineer pages
-                        .anyRequest().authenticated()  // All other requests require authentication
+                .csrf(csrf -> csrf.disable())
+                .authorizeRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers("/User/login").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("Admin")
+                        .requestMatchers("/stock/**").hasAuthority("StockAdmin")
+                        .requestMatchers("/Engineer/**").hasAuthority("Engineer")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session management
-                );
-
-        // Add JWT filter before UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .addFilterBefore(jwtRequestFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class); // Add JWT filter here
 
         return http.build();
+    }
+
+    @Bean
+    public JWTRequestFilter jwtRequestFilter(JWTUtil jwtUtil, UserDetailsService userDetailsService) {
+        return new JWTRequestFilter(jwtUtil, userDetailsService);
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-
 }

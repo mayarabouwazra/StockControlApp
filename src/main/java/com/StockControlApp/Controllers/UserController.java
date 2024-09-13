@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,8 @@ public class UserController {
 
     @Autowired
     private JWTUtil jwtUtil;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User request) {
@@ -35,7 +38,8 @@ public class UserController {
         if (isValid) {
             String token = jwtUtil.generateToken(request.getEmail());
 
-            // No need to extract authentication for login
+            System.out.println("Generated Token: " + token);  // Log the token for debugging
+
             return ResponseEntity.ok(Map.of(
                     "token", token,
                     "email", request.getEmail()
@@ -44,6 +48,7 @@ public class UserController {
             return ResponseEntity.status(401).body("Invalid email or password");
         }
     }
+
 
 
 

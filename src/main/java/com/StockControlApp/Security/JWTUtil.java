@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 @Component
 public class JWTUtil {
-    private static final String SECRET_KEY = "Secret_KEY";
+    private static final String SECRET_KEY = "c3VwZXItc2VjcmV0LXBhc3N3b3Jk\n";
 
     private static SecretKey generateKey() {
         try {
@@ -42,19 +42,20 @@ public class JWTUtil {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
-
-    public Boolean validateToken(String token, String email) {
-        final String username = extractUsername(token);
-        return (username.equals(email) && !isTokenExpired(token));
-    }
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Boolean validateToken(String token, String username) {
+        final String extractedUsername = extractUsername(token);
+        return (extractedUsername.equals(username) && !isTokenExpired(token));
+    }
+
+
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
+
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }

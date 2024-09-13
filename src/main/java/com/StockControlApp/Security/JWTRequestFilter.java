@@ -24,37 +24,28 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     @Autowired
     final private UserDetailsService userDetailsService;
 
-    public JWTRequestFilter(UserDetailsService userDetailsService) {
+    public JWTRequestFilter(JWTUtil jwtUtil, UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
+        this.jwtUtil=jwtUtil;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        final String authorizationHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("X-Auth-Token");
 
         String username = null;
         String jwt = null;
-
-        String requestURI = request.getRequestURI();
-
-        if (requestURI.equals("/User/login")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+        if (authHeader != null) {
+            jwt = authHeader;
             try {
-                username = jwtUtil.extractUsername(jwt);
+                username = jwtUtil.extractUsername(jwt);  // Extract username from the token
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Invalid or expired JWT token");
                 return;
             }
         }
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
@@ -70,4 +61,6 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+
+
 }
