@@ -19,9 +19,10 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Use the discriminator column (user_type) as the role
-        return Collections.singletonList(new SimpleGrantedAuthority(user.getClass().getAnnotation(DiscriminatorValue.class).value()));
+        String role = "ROLE_" + user.getClass().getAnnotation(DiscriminatorValue.class).value().toUpperCase();
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
+
 
     @Override
     public String getPassword() {

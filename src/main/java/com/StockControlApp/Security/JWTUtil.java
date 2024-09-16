@@ -3,6 +3,7 @@ package com.StockControlApp.Security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -15,6 +16,7 @@ import java.util.function.Function;
 
 @Component
 public class JWTUtil {
+    @Value("${jwt.secret}")
     private static final String SECRET_KEY = "c3VwZXItc2VjcmV0LXBhc3N3b3Jk\n";
 
     private static SecretKey generateKey() {

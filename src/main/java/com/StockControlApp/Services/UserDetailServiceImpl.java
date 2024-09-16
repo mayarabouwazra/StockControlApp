@@ -20,6 +20,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Engineer engineer = engineerRepository.findByEmail(email);
+
         if (engineer == null) {
             throw new UsernameNotFoundException("Engineer not found.");
         }

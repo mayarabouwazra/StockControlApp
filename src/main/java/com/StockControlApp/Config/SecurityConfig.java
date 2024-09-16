@@ -47,7 +47,7 @@ public class SecurityConfig {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
         mailSender.setUsername("farahelbey1998@gmail.com");
-        mailSender.setPassword("your-email-password"); // Replace with actual email password
+        mailSender.setPassword("defaultPassword");
         mailSender.setJavaMailProperties(getMailProperties());
         return mailSender;
     }
@@ -66,9 +66,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/User/login").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("Admin")
-                        .requestMatchers("/stock/**").hasAuthority("StockAdmin")
-                        .requestMatchers("/Engineer/**").hasAuthority("Engineer")
+                        .requestMatchers("/admin/**").hasRole("Admin")
+                        .requestMatchers("/stock/**").hasRole("StockAdmin")
+                        .requestMatchers("/Engineer/**").hasRole("Engineer")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
