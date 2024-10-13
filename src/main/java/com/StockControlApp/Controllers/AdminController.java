@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(value="/Admin", produces= MediaType.APPLICATION_JSON_VALUE)
 public class AdminController {

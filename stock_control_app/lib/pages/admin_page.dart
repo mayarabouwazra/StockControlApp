@@ -51,7 +51,7 @@ class _AdminPageState extends State<AdminPage> {
       return;
     }
 
-    final String apiUrl = 'http://localhost:8080/admin/projects';
+    final String apiUrl = 'http://localhost:8080/Admin/projects';
 
     try {
       final response = await http.post(
@@ -110,7 +110,7 @@ class _AdminPageState extends State<AdminPage> {
       return;
     }
 
-    final String apiUrl = 'http://localhost:8080/admin/createEngineer';
+    final String apiUrl = 'http://localhost:8080/Admin/createEngineer';
 
     try {
       final response = await http.post(
@@ -168,7 +168,7 @@ class _AdminPageState extends State<AdminPage> {
       return;
     }
 
-    final String apiUrl = 'http://localhost:8080/stockadmin/create';
+    final String apiUrl = 'http://localhost:8080/Admin/createStockAdmin';
 
     try {
       final response = await http.post(
@@ -177,7 +177,8 @@ class _AdminPageState extends State<AdminPage> {
         body: jsonEncode({
           "email": stockAdminEmail,
           "name": StockAdminName,
-          "last name":StockAdminLastName,
+          "prenom":StockAdminLastName,
+
         }),
       );
 
