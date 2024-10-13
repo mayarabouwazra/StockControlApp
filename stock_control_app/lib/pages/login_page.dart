@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:http/http.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -28,41 +32,62 @@ class _LoginState extends State<Login> {
       return;
     }
 
-    try {
-      final response = await http.post(
-        Uri.parse('http://192.168.x.x:8080/User/login'), // Use IP address if testing on a device
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }),
-      );
+    int retryCount = 0;
+    const int maxRetries = 3;
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final token = responseData['token'];
-        final email = responseData['email'];
-        final authorities = List<String>.from(responseData['authorities']);
-
-        await _storage.write(key: 'token', value: token);
-        await _storage.write(key: 'email', value: email);
-        await _storage.write(key: 'authorities', value: jsonEncode(authorities)); // Store as JSON
-
-        _navigateBasedOnAuthorities(authorities);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
+    while (retryCount < maxRetries) {
+      try {
+        final response = await http.post(
+          Uri.parse('http://192.168.x.x:8080/User/login'),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            'email': _emailController.text,
+            'password': _passwordController.text,
+          }),
         );
-      }
-    } catch (e, stacktrace) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
-      );
-      print('Error: $e');
-      print('Stacktrace: $stacktrace');
-    }
-  }
 
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          final token = responseData['token'];
+          final email = responseData['email'];
+          final authorities = List<String>.from(responseData['authorities']);
+
+          await _storage.write(key: 'token', value: token);
+          await _storage.write(key: 'email', value: email);
+          await _storage.write(key: 'authorities', value: jsonEncode(authorities)); // Store as JSON
+
+          _navigateBasedOnAuthorities(authorities);
+
+          return;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
+          );
+        }
+      } on SocketException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Socket exception: $e')),
+        );
+      } on ClientException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Client exception: $e')),
+        );
+      } catch (e, stacktrace) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+        print('Error: $e');
+        print('Stacktrace: $stacktrace');
+      }
+
+      retryCount++;
+      await Future.delayed(Duration(seconds: 1));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to connect to server. Please try again.')),
+    );
+  }
   void _navigateBasedOnAuthorities(List<String> authorities) {
     if (authorities.contains('Admin')) {
       Navigator.pushReplacementNamed(context, '/adminPage');

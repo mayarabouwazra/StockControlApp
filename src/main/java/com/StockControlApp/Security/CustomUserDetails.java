@@ -11,7 +11,9 @@ import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
+    private  User user;
+
+    String role = "ROLE_" + user.getClass().getAnnotation(DiscriminatorValue.class).value().toUpperCase();
 
     public CustomUserDetails(User user) {
         this.user = user;

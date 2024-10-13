@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class PrimaryStore {
     @Id
-    private Long id; // Assuming a fixed ID for the single primary store
+    private Long id;
 
 
     @OneToMany(mappedBy = "primaryStore", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -18,6 +18,12 @@ public class Project {
     private boolean stockComplete;
     private boolean destinationConfirmed;
 
+
+    @ManyToOne
+    @JoinColumn(name = "mobile_store_id")
+    private MobileStore mobileStore;
+
+
     @ManyToMany
     @JoinTable(
             name = "project_engineer",
@@ -68,6 +74,9 @@ public class Project {
 
     public String getProjectManager() {
         return projectManager;
+    }
+    public void setMobileStore(MobileStore mobileStore) {
+        this.mobileStore = mobileStore;
     }
 
     public void setProjectManager(String projectManager) {

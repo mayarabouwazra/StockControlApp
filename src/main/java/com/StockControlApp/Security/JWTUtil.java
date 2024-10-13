@@ -16,8 +16,10 @@ import java.util.function.Function;
 
 @Component
 public class JWTUtil {
-    @Value("${jwt.secret}")
-    private static final String SECRET_KEY = "c3VwZXItc2VjcmV0LXBhc3N3b3Jk\n";
+
+    private static final String SECRET_KEY = "c3VwZXItc2VjcmV0LXBhc3N3b3Jk";
+
+
 
     private static SecretKey generateKey() {
         try {
@@ -40,12 +42,16 @@ public class JWTUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 1000)) // 1000 hours expiration
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Claims getAllClaimsFromToken(String token) {
+        return extractAllClaims(token);
     }
 
     public Boolean validateToken(String token, String username) {
