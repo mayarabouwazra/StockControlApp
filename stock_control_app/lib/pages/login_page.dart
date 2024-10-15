@@ -32,64 +32,59 @@ class _LoginState extends State<Login> {
       return;
     }
 
-    int retryCount = 0;
-    const int maxRetries = 3;
+    try {
+      final token = await _storage.read(key: 'token');
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/User/login'),
 
-    while (retryCount < maxRetries) {
-      try {
-        print('Attempting login to http://172.16.20.104/User/login');
-        final response = await http.post(
-          Uri.parse('http://172.16.20.104:8080/User/login'),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({
-            'email': _emailController.text,
-            'password': _passwordController.text,
-          }),
-        );
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
 
-        print('Response: ${response.statusCode}, Body: ${response.body}'); // Debugging line
+        },
+        body: jsonEncode({
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+      );
 
-        if (response.statusCode == 200) {
-          final responseData = json.decode(response.body);
-          final token = responseData['token'];
-          final email = responseData['email'];
-          final authorities = List<String>.from(responseData['authorities']);
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final token = responseData['token'];
+        final email = responseData['email'];
+        final authorities = List<String>.from(responseData['authorities']);
 
-          await _storage.write(key: 'token', value: token);
-          await _storage.write(key: 'email', value: email);
-          await _storage.write(key: 'authorities', value: jsonEncode(authorities)); // Store as JSON
+        await _storage.write(key: 'token', value: token);
+        await _storage.write(key: 'email', value: email);
+        await _storage.write(key: 'authorities', value: jsonEncode(authorities)); // Store as JSON
 
-          _navigateBasedOnAuthorities(authorities);
+        _navigateBasedOnAuthorities(authorities);
 
-          return;
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
-          );
-          print('Login failed with status code: ${response.statusCode}');
-          print('Response body: ${response.body}');
-        }
-      } on SocketException catch (e) {
-        print('SocketException: $e'); // Debugging line
+        return;
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Socket exception: $e')),
+          SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
         );
-      } on ClientException catch (e) {
-        print('ClientException: $e'); // Debugging line
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Client exception: $e')),
-        );
-      } catch (e, stacktrace) {
-        print('Error: $e, Stacktrace: $stacktrace'); // Debugging line
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-        print('Error: $e');
-        print('Stacktrace: $stacktrace');
+        print('Login failed with status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
       }
-
-      retryCount++;
-      await Future.delayed(Duration(seconds: 1));
+    } on SocketException catch (e) {
+      print('SocketException: $e'); // Debugging line
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Socket exception: $e')),
+      );
+    } on ClientException catch (e) {
+      print('ClientException: $e'); // Debugging line
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client exception: $e')),
+      );
+    } catch (e, stacktrace) {
+      print('Error: $e, Stacktrace: $stacktrace'); // Debugging line
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      print('Error: $e');
+      print('Stacktrace: $stacktrace');
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
