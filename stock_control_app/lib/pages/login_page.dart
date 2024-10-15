@@ -37,14 +37,17 @@ class _LoginState extends State<Login> {
 
     while (retryCount < maxRetries) {
       try {
+        print('Attempting login to http://172.16.20.104/User/login');
         final response = await http.post(
-          Uri.parse('http://192.168.x.x:8080/User/login'),
+          Uri.parse('http://172.16.20.104:8080/User/login'),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({
             'email': _emailController.text,
             'password': _passwordController.text,
           }),
         );
+
+        print('Response: ${response.statusCode}, Body: ${response.body}'); // Debugging line
 
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -63,16 +66,21 @@ class _LoginState extends State<Login> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Login failed. Status code: ${response.statusCode}')),
           );
+          print('Login failed with status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
         }
       } on SocketException catch (e) {
+        print('SocketException: $e'); // Debugging line
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Socket exception: $e')),
         );
       } on ClientException catch (e) {
+        print('ClientException: $e'); // Debugging line
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Client exception: $e')),
         );
       } catch (e, stacktrace) {
+        print('Error: $e, Stacktrace: $stacktrace'); // Debugging line
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );

@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +20,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
+
     private UserService userService;
 
 
@@ -30,7 +28,7 @@ public class UserController {
     private JWTUtil jwtUtil;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    @CrossOrigin(origins = {"http://localhost:59827", "http://172.16.20.104"}, allowCredentials = "true")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User request) {
         boolean isValid = userService.validateUserCredentials(request.getEmail(), request.getPassword());
@@ -38,7 +36,7 @@ public class UserController {
         if (isValid) {
             String token = jwtUtil.generateToken(request.getEmail());
 
-            System.out.println("Generated Token: " + token);  // Log the token for debugging
+            System.out.println("Generated Token: " + token);
 
             return ResponseEntity.ok(Map.of(
                     "token", token,
